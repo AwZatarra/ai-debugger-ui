@@ -90,4 +90,28 @@ export const incidentApi = {
     proposalId: string,
     body: { reviewer: string; notes: string }
   ) => apiPost<any>(`/pr-proposals/${proposalId}/reject`, body),
+
+  preparePrProposalExecution: (proposalId: string) =>
+    apiPost<any>(`/pr-proposals/${proposalId}/prepare-execution`),
+
+  generatePrProposalFileEdits: (proposalId: string) =>
+    apiPost<any>(`/pr-proposals/${proposalId}/generate-file-edits`),
+
+  regeneratePrProposalFileEdits: (proposalId: string) =>
+    apiPost<any>(`/pr-proposals/${proposalId}/regenerate-file-edits`),
+
+  validatePrProposalFileEdits: (proposalId: string) =>
+    apiPost<any>(`/pr-proposals/${proposalId}/validate-file-edits`),
+
+  runPrProposalLocalChecks: (proposalId: string) =>
+    apiPost<any>(`/pr-proposals/${proposalId}/run-local-checks`),
+
+  createGithubPrFromProposal: (proposalId: string) =>
+    apiPost<any>(`/pr-proposals/${proposalId}/create-github-pr`),
+
+  getIncidentPrActions: (incidentId: string) =>
+    apiGet<any>(`/incidents/${incidentId}/pr-actions`),
+
+  getPrProposalActions: (proposalId: string) =>
+    apiGet<any>(`/pr-proposals/${proposalId}/actions`),
 };

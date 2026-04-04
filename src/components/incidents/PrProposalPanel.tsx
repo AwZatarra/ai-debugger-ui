@@ -1,10 +1,13 @@
 import PrProposalReviewActions from "@/src/components/incidents/PrProposalReviewActions";
+import PrProposalExecutionActions from "@/src/components/incidents/PrProposalExecutionActions";
 
 type Props = {
   data: any;
   loading?: boolean;
   error?: any;
   onReviewed?: () => void | Promise<void>;
+  onExecutionActionDone?: () => void | Promise<void>;
+  proposalActionsData?: any;
 };
 
 function normalizePrProposal(data: any) {
@@ -18,12 +21,15 @@ function normalizePrProposal(data: any) {
   const nestedReview = nestedProposal?.review ?? {};
 
   const merged = {
-    proposal_id: envelope?.proposal_id ?? nestedProposal?.proposal_id ?? null,
+    proposal_id:
+      envelope?.proposal_id ??
+      nestedProposal?.proposal_id ??
+      null,
+
     title: envelope?.title ?? nestedProposal?.title ?? null,
     status: envelope?.status ?? nestedProposal?.status ?? null,
     repository: envelope?.repository ?? nestedProposal?.repository ?? null,
-    target_branch:
-      envelope?.target_branch ?? nestedProposal?.target_branch ?? null,
+    target_branch: envelope?.target_branch ?? nestedProposal?.target_branch ?? null,
     risk_level: envelope?.risk_level ?? nestedProposal?.risk_level ?? null,
     summary: envelope?.summary ?? nestedProposal?.summary ?? null,
     allowlisted_paths:
@@ -91,6 +97,8 @@ export default function PrProposalPanel({
   loading,
   error,
   onReviewed,
+  onExecutionActionDone,
+  proposalActionsData,
 }: Props) {
   const proposal = normalizePrProposal(data);
 
@@ -184,6 +192,13 @@ export default function PrProposalPanel({
             status={proposal.status}
             initialNotes={proposal.review_notes ?? ""}
             onReviewed={onReviewed}
+          />
+
+          <PrProposalExecutionActions
+            proposalId={proposal.proposal_id}
+            proposalStatus={proposal.status}
+            actionsData={proposalActionsData}
+            onDone={onExecutionActionDone}
           />
 
           <div>

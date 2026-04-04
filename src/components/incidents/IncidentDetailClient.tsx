@@ -16,6 +16,7 @@ import LlmFeedbackForm from "@/src/components/incidents/LlmFeedbackForm";
 import LlmEvaluationPanel from "@/src/components/incidents/LlmEvaluationPanel";
 import PrProposalPanel from "@/src/components/incidents/PrProposalPanel";
 import PrProposalHistoryPanel from "@/src/components/incidents/PrProposalHistoryPanel";
+import PrActionsPanel from "@/src/components/incidents/PrActionsPanel";
 import { incidentApi } from "@/src/lib/api";
 
 type Props = {
@@ -27,6 +28,16 @@ type AnalyzeResultPayload = {
   llmReport?: any;
   prProposal?: any;
 };
+
+function getLatestProposalId(data: any): string | null {
+  return (
+    data?.result?.proposal_id ??
+    data?.result?.proposal?.proposal_id ??
+    data?.proposal_id ??
+    data?.proposal?.proposal_id ??
+    null
+  );
+}
 
 export default function IncidentDetailClient({ incidentId }: Props) {
   const [latestHeuristicReport, setLatestHeuristicReport] = useState<any>(null);
@@ -77,6 +88,18 @@ export default function IncidentDetailClient({ incidentId }: Props) {
     () => incidentApi.getPrProposalHistory(incidentId)
   );
 
+  const incidentPrActionsQuery = useSWR(
+    ["incident-pr-actions", incidentId],
+    () => incidentApi.getIncidentPrActions(incidentId)
+  );
+
+  const latestProposalId = getLatestProposalId(prProposalQuery.data);
+
+  const proposalPrActionsQuery = useSWR(
+    latestProposalId ? ["proposal-pr-actions", latestProposalId] : null,
+    () => incidentApi.getPrProposalActions(latestProposalId as string)
+  );
+
   const refreshAll = async (payload?: AnalyzeResultPayload) => {
     if (payload?.heuristicReport) {
       setLatestHeuristicReport(payload.heuristicReport);
@@ -96,6 +119,8 @@ export default function IncidentDetailClient({ incidentId }: Props) {
       llmEvaluationQuery.mutate(),
       prProposalQuery.mutate(),
       prProposalHistoryQuery.mutate(),
+      incidentPrActionsQuery.mutate(),
+      proposalPrActionsQuery.mutate(),
     ]);
   };
 
@@ -108,7 +133,8 @@ export default function IncidentDetailClient({ incidentId }: Props) {
     llmFeedbackQuery.isLoading &&
     llmEvaluationQuery.isLoading &&
     prProposalQuery.isLoading &&
-    prProposalHistoryQuery.isLoading;
+    prProposalHistoryQuery.isLoading &&
+    incidentPrActionsQuery.isLoading;
 
   const summaryData =
     summaryQuery.data?.summary ??
@@ -142,7 +168,9 @@ export default function IncidentDetailClient({ incidentId }: Props) {
     llmFeedbackQuery.error ||
     llmEvaluationQuery.error ||
     prProposalQuery.error ||
-    prProposalHistoryQuery.error;
+    prProposalHistoryQuery.error ||
+    incidentPrActionsQuery.error ||
+    proposalPrActionsQuery.error;
 
   return (
     <div className="space-y-6">
@@ -191,14 +219,16 @@ export default function IncidentDetailClient({ incidentId }: Props) {
             {knowledgeQuery.error && <p>Knowledge: {knowledgeQuery.error.message}</p>}
             {llmHistoryQuery.error && <p>LLM History: {llmHistoryQuery.error.message}</p>}
             {llmFeedbackQuery.error && <p>LLM Feedback: {llmFeedbackQuery.error.message}</p>}
-            {llmEvaluationQuery.error && (
-              <p>LLM Evaluation: {llmEvaluationQuery.error.message}</p>
-            )}
-            {prProposalQuery.error && (
-              <p>PR Proposal: {prProposalQuery.error.message}</p>
-            )}
+            {llmEvaluationQuery.error && <p>LLM Evaluation: {llmEvaluationQuery.error.message}</p>}
+            {prProposalQuery.error && <p>PR Proposal: {prProposalQuery.error.message}</p>}
             {prProposalHistoryQuery.error && (
               <p>PR Proposal History: {prProposalHistoryQuery.error.message}</p>
+            )}
+            {incidentPrActionsQuery.error && (
+              <p>PR Actions: {incidentPrActionsQuery.error.message}</p>
+            )}
+            {proposalPrActionsQuery.error && (
+              <p>Proposal Actions: {proposalPrActionsQuery.error.message}</p>
             )}
           </div>
         </section>
@@ -229,6 +259,8 @@ export default function IncidentDetailClient({ incidentId }: Props) {
           loading={prProposalQuery.isLoading}
           error={prProposalQuery.error}
           onReviewed={() => refreshAll()}
+          onExecutionActionDone={() => refreshAll()}
+          proposalActionsData={proposalPrActionsQuery.data}
         />
 
         <PrProposalHistoryPanel
@@ -237,6 +269,12 @@ export default function IncidentDetailClient({ incidentId }: Props) {
           error={prProposalHistoryQuery.error}
         />
       </div>
+
+      <PrActionsPanel
+        data={incidentPrActionsQuery.data}
+        loading={incidentPrActionsQuery.isLoading}
+        error={incidentPrActionsQuery.error}
+      />
 
       <LlmRankingHistoryPanel
         data={llmHistoryQuery.data}
