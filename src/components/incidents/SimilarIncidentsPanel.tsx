@@ -5,7 +5,9 @@ type Props = {
 };
 
 export default function SimilarIncidentsPanel({ data, loading, error }: Props) {
-  const items = Array.isArray(data?.similar_incidents)
+  const items = Array.isArray(data?.result?.similar_incidents)
+    ? data.result.similar_incidents
+    : Array.isArray(data?.similar_incidents)
     ? data.similar_incidents
     : Array.isArray(data)
     ? data
@@ -24,11 +26,38 @@ export default function SimilarIncidentsPanel({ data, loading, error }: Props) {
 
       <div className="space-y-3">
         {items.map((item: any, index: number) => (
-          <div key={item.incident_id ?? index} className="rounded-lg border border-zinc-800 p-3 text-sm">
-            <p><span className="text-zinc-400">ID:</span> {item.incident_id ?? "-"}</p>
-            <p><span className="text-zinc-400">Score:</span> {item.score ?? "-"}</p>
-            <p><span className="text-zinc-400">RCA:</span> {item.probable_root_cause ?? "-"}</p>
-            <p><span className="text-zinc-400">Summary:</span> {item.summary ?? "-"}</p>
+          <div
+            key={item.incident_id ?? index}
+            className="rounded-lg border border-zinc-800 p-3 text-sm"
+          >
+            <p>
+              <span className="text-zinc-400">ID:</span>{" "}
+              {item.incident_id ?? "-"}
+            </p>
+            <p>
+              <span className="text-zinc-400">Title:</span>{" "}
+              {item.title ?? "-"}
+            </p>
+            <p>
+              <span className="text-zinc-400">Service:</span>{" "}
+              {item.primary_service ?? "-"}
+            </p>
+            <p>
+              <span className="text-zinc-400">Severity:</span>{" "}
+              {item.severity ?? "-"}
+            </p>
+            <p>
+              <span className="text-zinc-400">Similarity score:</span>{" "}
+              {item.similarity_score ?? "-"}
+            </p>
+            <p>
+              <span className="text-zinc-400">Reason:</span>{" "}
+              {item.similarity_reason ?? "-"}
+            </p>
+            <p>
+              <span className="text-zinc-400">Created at:</span>{" "}
+              {item.created_at ?? "-"}
+            </p>
           </div>
         ))}
       </div>

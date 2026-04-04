@@ -5,7 +5,9 @@ type Props = {
 };
 
 export default function KnowledgeMatchesPanel({ data, loading, error }: Props) {
-  const items = Array.isArray(data?.matches)
+  const items = Array.isArray(data?.result?.matches)
+    ? data.result.matches
+    : Array.isArray(data?.matches)
     ? data.matches
     : Array.isArray(data)
     ? data
@@ -24,11 +26,41 @@ export default function KnowledgeMatchesPanel({ data, loading, error }: Props) {
 
       <div className="space-y-3">
         {items.map((item: any, index: number) => (
-          <div key={item.id ?? index} className="rounded-lg border border-zinc-800 p-3 text-sm">
-            <p><span className="text-zinc-400">Title:</span> {item.title ?? "-"}</p>
-            <p><span className="text-zinc-400">Score:</span> {item.score ?? "-"}</p>
-            <p><span className="text-zinc-400">Source:</span> {item.source ?? "-"}</p>
-            <p className="mt-2 whitespace-pre-wrap">{item.chunk ?? "-"}</p>
+          <div
+            key={item.chunk_id ?? item.id ?? index}
+            className="rounded-lg border border-zinc-800 p-3 text-sm"
+          >
+            <p>
+              <span className="text-zinc-400">Source type:</span>{" "}
+              {item.source_type ?? "-"}
+            </p>
+            <p>
+              <span className="text-zinc-400">Source name:</span>{" "}
+              {item.source_name ?? item.title ?? "-"}
+            </p>
+            <p>
+              <span className="text-zinc-400">Service:</span>{" "}
+              {item.service ?? "-"}
+            </p>
+            <p>
+              <span className="text-zinc-400">Route:</span>{" "}
+              {item.route ?? "-"}
+            </p>
+            <p>
+              <span className="text-zinc-400">Error code:</span>{" "}
+              {item.error_code ?? "-"}
+            </p>
+            <p>
+              <span className="text-zinc-400">Match score:</span>{" "}
+              {item.match_score ?? item.score ?? "-"}
+            </p>
+            <p>
+              <span className="text-zinc-400">Reason:</span>{" "}
+              {item.match_reason ?? "-"}
+            </p>
+            <p className="mt-2 whitespace-pre-wrap">
+              {item.text ?? item.chunk ?? "-"}
+            </p>
           </div>
         ))}
       </div>
