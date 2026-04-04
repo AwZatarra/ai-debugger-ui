@@ -805,47 +805,7 @@ En DevTools > Network, confirma:
 
 ## 20. Fallos comunes y cómo detectarlos
 
-## 20.1 `Module not found: Can't resolve '@/lib/api'`
-
-**Síntoma**
-- build o dev server falla al compilar
-
-**Causa probable**
-- alias `@/` no resuelto correctamente
-
-**Solución**
-- validar `tsconfig.json`
-- validar estructura real del proyecto
-- confirmar que `src/lib/api.ts` exista
-
-## 20.2 `Objects are not valid as a React child`
-
-**Síntoma**
-- pantalla rompe al renderizar summary o contexto
-
-**Causa probable**
-- se renderiza un objeto completo en JSX
-
-**Solución**
-- normalizar data antes de renderizar
-- usar campos concretos, no el objeto completo
-
-## 20.3 `Failed to fetch`
-
-**Síntoma**
-- la UI no carga datos
-
-**Causa probable**
-- backend caído
-- `NEXT_PUBLIC_API_BASE_URL` incorrecto
-- CORS o cambio de host
-
-**Solución**
-- validar backend en Postman o navegador
-- revisar `.env.local`
-- reiniciar frontend
-
-## 20.4 `.env.local` cambia pero la UI sigue igual
+## 20.1 `.env.local` cambia pero la UI sigue igual
 
 **Síntoma**
 - el frontend sigue pegando al host viejo
@@ -856,7 +816,7 @@ En DevTools > Network, confirma:
 **Solución**
 - detener y reiniciar el dev server completo
 
-## 20.5 Problemas con host de red en vez de localhost
+## 20.2 Problemas con host de red en vez de localhost
 
 **Síntoma**
 - assets o fetch se comportan raro usando IP de red
@@ -867,53 +827,6 @@ En DevTools > Network, confirma:
 **Solución**
 - usar `localhost` en desarrollo si ese fue el setup validado
 - si usas host de red, revisar configuración adicional de Next.js
-
-## 20.6 `allowedDevOrigins`
-
-**Síntoma**
-- recursos de desarrollo bloqueados al usar host de red
-
-**Causa probable**
-- origen dev no permitido por Next.js
-
-**Solución confirmada previamente**
-- agregar `allowedDevOrigins` en `next.config.ts`/`next.config.js` cuando aplique
-
-## 20.7 404 en rutas de prueba
-
-**Síntoma**
-- abrir una ruta y obtener 404 inesperado
-
-**Causa probable**
-- ruta no existe en `src/app`
-- confusión entre rutas reales y de prueba
-
-**Solución**
-- validar estructura real de app routes
-- usar navegación ya existente desde la UI
-
-## 20.8 PR Proposal no se muestra aunque el backend responde bien
-
-**Síntoma**
-- history muestra proposals pero latest no aparece
-
-**Causa probable**
-- normalización inconsistente entre `POST /pr-proposal` y `GET /pr-proposal`
-
-**Solución confirmada**
-- priorizar `GET latest proposal` como fuente de verdad
-- normalizar `result` y `result.proposal`
-
-## 20.9 Keys duplicadas en proposal history
-
-**Síntoma**
-- error React por children con misma key
-
-**Causa probable**
-- historial con `proposal_id` repetido
-
-**Solución confirmada**
-- usar key compuesta con `proposal_id + created_at + status + index`
 
 ---
 
