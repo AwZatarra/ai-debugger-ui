@@ -174,43 +174,59 @@ export default function IncidentDetailClient({ incidentId }: Props) {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold">Incident Detail</h2>
-            <p className="mt-2 text-sm text-zinc-400">
-              <span className="font-medium text-zinc-200">ID:</span> {incidentId}
+      <section className="rounded-lg border border-white/10 bg-slate-950/72 p-6 shadow-2xl shadow-slate-950/25">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-3xl">
+            <p className="text-sm font-semibold uppercase tracking-wide text-cyan-200">
+              Incident workspace
+            </p>
+            <h1 className="mt-2 text-3xl font-black text-white">
+              Detalle del incidente
+            </h1>
+            <p className="mt-3 break-all rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-300">
+              <span className="font-semibold text-slate-100">ID:</span> {incidentId}
+            </p>
+            <p className="mt-3 text-sm leading-6 text-slate-400">
+              Consolida contexto, resumen, RCA heuristico, ranking LLM,
+              feedback humano y propuesta de PR en una sola vista.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => refreshAll()}
-              className="rounded bg-white px-4 py-2 text-sm font-medium text-black"
+              className="rounded-lg bg-cyan-300 px-5 py-3 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-950/25 hover:bg-cyan-200"
             >
               Refrescar detalle
             </button>
 
             <Link
               href="/incidents"
-              className="rounded border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm font-medium text-zinc-100 hover:bg-zinc-800"
+              className="rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-white hover:border-cyan-300/40 hover:bg-white/10"
             >
               Volver a incidentes
             </Link>
           </div>
+        </div>
+
+        <div className="mt-6 grid gap-3 md:grid-cols-4">
+          <SignalCard label="Contexto" active={!contextQuery.error} />
+          <SignalCard label="Summary" active={!summaryQuery.error} />
+          <SignalCard label="LLM ranking" active={!llmHistoryQuery.error} />
+          <SignalCard label="PR proposal" active={!prProposalQuery.error} />
         </div>
       </section>
 
       <AnalyzeActions incidentId={incidentId} onDone={refreshAll} />
 
       {isInitialLoading && (
-        <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-          <p className="text-zinc-300">Cargando detalle del incidente...</p>
+        <section className="rounded-lg border border-white/10 bg-slate-950/72 p-5">
+          <p className="text-slate-300">Cargando detalle del incidente...</p>
         </section>
       )}
 
       {hasAnyError && (
-        <section className="rounded-xl border border-red-900 bg-red-950/40 p-4">
+        <section className="rounded-lg border border-red-300/25 bg-red-950/40 p-5">
           <div className="space-y-1 text-sm text-red-300">
             <p>Error cargando parte del detalle del incidente.</p>
             {contextQuery.error && <p>Contexto: {contextQuery.error.message}</p>}
@@ -314,6 +330,23 @@ export default function IncidentDetailClient({ incidentId }: Props) {
           error={knowledgeQuery.error}
         />
       </div>
+    </div>
+  );
+}
+
+function SignalCard({ label, active }: { label: string; active: boolean }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        {label}
+      </p>
+      <p
+        className={`mt-2 text-sm font-bold ${
+          active ? "text-emerald-200" : "text-red-200"
+        }`}
+      >
+        {active ? "Disponible" : "Revisar"}
+      </p>
     </div>
   );
 }
